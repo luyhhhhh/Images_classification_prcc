@@ -134,10 +134,10 @@ class vgg19_Net(nn.Module):
 CUDA = torch.cuda.is_available()
 
 print(CUDA)
-if CUDA:
-    vgg19_model = vgg19_Net(in_img_rgb=1, in_img_size=32, out_class=13, in_fc_size=512).cuda()
-else:
-    vgg19_model = vgg19_Net(in_img_rgb=1, in_img_size=32, out_class=13, in_fc_size=512)
+# if CUDA:
+#     vgg19_model = vgg19_Net(in_img_rgb=1, in_img_size=32, out_class=13, in_fc_size=512).cuda()
+# else:
+vgg19_model = vgg19_Net(in_img_rgb=1, in_img_size=32, out_class=13, in_fc_size=512)
 
 print(vgg19_model)
 

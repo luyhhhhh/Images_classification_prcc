@@ -5,7 +5,7 @@ from torchvision import transforms
 from torch.utils.data import DataLoader, Dataset
 from PIL import Image
 
-def prepare_data_loaders(image_dir, test_size=0.2, batch_size=16):
+def prepare_data_loaders(image_dir, test_size=0.2, batch_size=4):
     # 获取文件夹中的类别
     classes = [d for d in os.listdir(image_dir) if os.path.isdir(os.path.join(image_dir, d))]
 
