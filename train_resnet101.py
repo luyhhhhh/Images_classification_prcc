@@ -112,6 +112,8 @@ def main():
     )
 
 
+#cfdjch
+
     model = model.to(device)
 
     criterion = nn.CrossEntropyLoss()
