@@ -15,7 +15,8 @@ def train_model(model, train_loader, criterion, optimizer, num_epochs=25):
         start_time = time.time()  # 开始计时
 
         # 使用 tqdm 包装迭代器来显示进度
-        progress = tqdm(train_loader, desc=f'Epoch {epoch + 1}/{num_eluypochs}', leave=True)
+        progress = tqdm(train_loader, desc=f'Epoch {epoch + 1}/{num_epochs}', leave=True)
+
         for inputs, labels in progress:
             # 将数据移动到当前设备上（CPU或GPU）
             inputs, labels = inputs.to(device), labels.to(device)
@@ -72,7 +73,8 @@ print("model finish prepare")
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 # 检测是否有可用的GPU，如果没有，则使用CPU
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device('cpu')
 model.to(device)  # 将模型发送到设备
 
 print("start prepare images")
