@@ -1,4 +1,6 @@
 # Images_classification_prcc
+本代码是针对北京航空航天大学2023-2024学年秋季学期《深度学习与医学图像处理》课程作业而编写，旨在实现乳头状肾细胞癌（papillary renal cell carcinoma, pRCC）两种亚型的一种二分类任务。
+
 ### 项目代码使用教程
 
 #### 环境准备
