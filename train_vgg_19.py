@@ -6,8 +6,8 @@ from tqdm import tqdm
 from sklearn.metrics import f1_score, accuracy_score
 from torch.cuda.amp import GradScaler, autocast  # 用于混合精度训练
 
-from img2data_res import prepare_data_loaders
-from test import vgg19_Net
+from img2data import prepare_data_loaders
+from model_vgg_19 import vgg19_Net
 
 def train_model(model, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs=25):
     use_cuda = torch.cuda.is_available()

@@ -6,7 +6,7 @@ from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader
 from sklearn.metrics import accuracy_score, f1_score
 from tqdm import tqdm
-from img2data_res import prepare_data_loaders
+from img2data import prepare_data_loaders
 from torchvision.models import resnet101, ResNet101_Weights
 from torch.cuda.amp import GradScaler, autocast
 
