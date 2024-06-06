@@ -1,12 +1,10 @@
 import torch.nn as nn
 import torch
 
-
 class vgg19_Net(nn.Module):
     def __init__(self, in_img_rgb=3, in_img_size=224, out_class=2, in_fc_size=25088):
         super(vgg19_Net, self).__init__()
 
-        # 初始化卷积层和池化层
         self.conv1 = nn.Sequential(
             nn.Conv2d(in_channels=in_img_rgb, out_channels=64, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(64),
@@ -36,67 +34,65 @@ class vgg19_Net(nn.Module):
         )
         self.conv6 = nn.Sequential(
             nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.BatchNorm2d(256),
             nn.ReLU()
         )
         self.conv7 = nn.Sequential(
             nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.BatchNorm2d(256),
             nn.ReLU()
         )
-
         self.conv8 = nn.Sequential(
             nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.BatchNorm2d(256),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+            nn.MaxPool2d(kernel_size=2, stride=2)
         )
         self.conv9 = nn.Sequential(
             nn.Conv2d(in_channels=256, out_channels=512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.BatchNorm2d(512),
             nn.ReLU()
         )
         self.conv10 = nn.Sequential(
             nn.Conv2d(in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.BatchNorm2d(512),
             nn.ReLU()
         )
         self.conv11 = nn.Sequential(
             nn.Conv2d(in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.BatchNorm2d(512),
             nn.ReLU()
         )
         self.conv12 = nn.Sequential(
             nn.Conv2d(in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.BatchNorm2d(512),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+            nn.MaxPool2d(kernel_size=2, stride=2)
         )
         self.conv13 = nn.Sequential(
             nn.Conv2d(in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.BatchNorm2d(512),
             nn.ReLU()
         )
         self.conv14 = nn.Sequential(
             nn.Conv2d(in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.BatchNorm2d(512),
             nn.ReLU()
         )
         self.conv15 = nn.Sequential(
             nn.Conv2d(in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.BatchNorm2d(512),
             nn.ReLU()
         )
         self.conv16 = nn.Sequential(
             nn.Conv2d(in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.BatchNorm2d(512),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+            nn.MaxPool2d(kernel_size=2, stride=2)
         )
 
-        # 全连接层
         self.fc17 = nn.Sequential(
-            nn.Linear(512 * 7 * 7, 4096),  # 调整全连接层的输入尺寸
+            nn.Linear(512 * 7 * 7, 4096),
             nn.ReLU(),
             nn.Dropout(0.5)  # 增加 Dropout
         )
@@ -105,29 +101,25 @@ class vgg19_Net(nn.Module):
             nn.ReLU(),
             nn.Dropout(0.5)
         )
-        self.fc19 = nn.Linear(4096, out_class)  # 输出层调整为两类
+        self.fc19 = nn.Linear(4096, out_class)
 
         self.conv_list = [self.conv1, self.conv2, self.conv3, self.conv4, self.conv5, self.conv6, self.conv7,
-                          self.conv8,
-                          self.conv9, self.conv10, self.conv11, self.conv12, self.conv13, self.conv14, self.conv15,
-                          self.conv16]
+                          self.conv8, self.conv9, self.conv10, self.conv11, self.conv12, self.conv13, self.conv14,
+                          self.conv15, self.conv16]
 
         self.fc_list = [self.fc17, self.fc18, self.fc19]
 
     def forward(self, x):
-
         for conv in self.conv_list:
             x = conv(x)
 
         fc = x.view(x.size(0), -1)
 
-        # 查看全连接层的参数：in_fc_size  的值
-        # print("vgg19_model_fc:",fc.size(1))
-
         for fc_item in self.fc_list:
             fc = fc_item(fc)
 
         return fc
+
 
 
 # 检测 gpu是否可用

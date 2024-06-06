@@ -8,12 +8,13 @@ from sklearn.metrics import accuracy_score, f1_score
 from tqdm import tqdm
 from img2data_res import prepare_data_loaders
 from torchvision.models import resnet101, ResNet101_Weights
-
+from torch.cuda.amp import GradScaler, autocast
 
 def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs=25, patience=5, device='cpu'):
     best_model_wts = model.state_dict()
     best_acc = 0.0
     no_improve_epochs = 0  # Early stopping tracker
+    scaler = GradScaler() if device.type == 'cuda' else None  # 仅在 CUDA 可用时初始化 GradScaler
 
     for epoch in range(num_epochs):
         print(f'Epoch {epoch + 1}/{num_epochs}')
@@ -27,28 +28,38 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs=
 
             running_loss = 0.0
             running_corrects = 0
+            total_samples = 0
 
             for inputs, labels in tqdm(dataloaders[phase], desc=f"Epoch {epoch + 1} - {phase}"):
                 inputs, labels = inputs.to(device), labels.to(device)
 
                 optimizer.zero_grad()
 
-                with torch.set_grad_enabled(phase == 'train'):
-                    outputs = model(inputs)
-                    _, preds = torch.max(outputs, 1)
-                    loss = criterion(outputs, labels)
-
-                    if phase == 'train':
-                        loss.backward()
-                        optimizer.step()
+                if device.type == 'cuda' and phase == 'train':
+                    with autocast():
+                        outputs = model(inputs)
+                        loss = criterion(outputs, labels)
+                        _, preds = torch.max(outputs, 1)
+                    scaler.scale(loss).backward()
+                    scaler.step(optimizer)
+                    scaler.update()
+                else:
+                    with torch.set_grad_enabled(phase == 'train'):
+                        outputs = model(inputs)
+                        loss = criterion(outputs, labels)
+                        _, preds = torch.max(outputs, 1)
+                        if phase == 'train':
+                            loss.backward()
+                            optimizer.step()
 
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
+                total_samples += inputs.size(0)
 
-            epoch_loss = running_loss / len(dataloaders[phase].dataset)
-            epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
+            epoch_loss = running_loss / total_samples
+            epoch_acc = running_corrects.double() / total_samples * 100
 
-            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
+            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.2f}%')
 
             if phase == 'val':
                 if epoch_acc > best_acc:
@@ -110,9 +121,6 @@ def main():
         nn.Dropout(0.4),  # 加入 Dropout
         nn.Linear(num_ftrs, 2)
     )
-
-
-#cfdjch
 
     model = model.to(device)
 
