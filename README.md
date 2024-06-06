@@ -49,9 +49,9 @@ image/
 
 项目代码包含以下几个主要文件：
 
-1. `train.py`：用于训练模型
-2. `test.py`：定义了VGG19模型结构
-3. `img2data.py` 和 `img2data_res.py`：用于数据预处理和加载
+1. `train_vgg_19.py`和`train_resnet_101.py`：用于训练模型
+2. `model_vgg_19.py`：定义了VGG19模型结构
+3. `img2data.py`：用于数据预处理和加载
 
 #### 运行代码
 
