@@ -100,7 +100,7 @@ model = vgg19_Net(in_img_rgb=3, in_img_size=224, out_class=2, in_fc_size=512*7*7
 print("model finish prepare")
 # 设置损失函数和优化器
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+optimizer = optim.Adam(model.parameters(), lr=0.0001)
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3, factor=0.1)
 # 检测是否有可用的GPU，如果没有，则使用CPU
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -110,7 +110,7 @@ print("start prepare images")
 
 # 数据预处理
 image_directory = 'image'  # 图像文件夹路径
-batch_size = 32  # 设置批处理大小
+batch_size = 8  # 设置批处理大小
 train_loader, val_loader, test_loader = prepare_data_loaders(image_directory, batch_size=batch_size)
 
 print("finish prepare images")
